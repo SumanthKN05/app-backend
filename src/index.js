@@ -1,22 +1,26 @@
-//require('dotenv').config({path:'./env'})//
-
 import dotenv from 'dotenv';
+import {app} from './app.js'
 import connectDB from './db/index.js';
 
 dotenv.config({
   path: './env'
 })
 
+
+
+// You can add your middleware or routes here if needed
+// For example, app.use() or app.get()
+
 connectDB()
-.then(()=>{
-  app.listen(process.env.PORT || 8000,()=>{
-    console.log(`Server running on port ${process.env.PORT}`)
+  .then(() => {
+    app.listen(process.env.PORT || 8000, () => {
+      console.log(`Server running on port ${process.env.PORT || 8000}`);
+    });
+  })
+  .catch((err) => {
+    console.log('Error connecting to MongoDB:', err);
+    process.exit(1);
   });
-})
-.catch((err)=>{
-  console.log('Error connecting to MongoDB:', err)
-  process.exit(1)
-})
 
 
 

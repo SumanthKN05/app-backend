@@ -8,7 +8,7 @@ class ApiError extends Error{
     this.success=false;
     this.errors=errors;
 
-  //there are many api errors some times so for structing api erros we use this
+  //there are many api errors some times so for structing api errors we use this
   if(stack){
     this.stack=stack;
 } else{
