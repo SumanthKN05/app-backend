@@ -14,7 +14,7 @@ app.use(express.static("public"));
 // Routes import
 import userRouter from './routes/user.routes.js';
 
-// Routes declaration (corrected the mistake here)
+// Routes declaration
 app.use("/api/v1/users", userRouter);  // Use a comma, not a dot
 
 export { app };
