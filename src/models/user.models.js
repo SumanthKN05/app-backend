@@ -90,4 +90,4 @@ userSchema.methods.generateRefreshToken = function () {
     });
 };
 
-export const User = mongoose.model('User', userSchema); // Fixed typo in userSchema
+export const User = mongoose.model('User',userSchema); 
