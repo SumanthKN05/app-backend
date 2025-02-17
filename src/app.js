@@ -8,7 +8,7 @@ const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true}));
-app.use(cookieParser());
+app.use(cookieParser());//helps in accessing cookies
 app.use(express.static("public"));
 
 // Routes import
