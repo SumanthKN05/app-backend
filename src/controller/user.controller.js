@@ -208,7 +208,131 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 })
 
+/*changing the current user's password*/
+const changeCurrentPassword=asyncHandler(async(req,res)=>
+  {
+  const{oldPassword,newPassword}=req.body
 
+  const user=await User.findById(req.user?._id)
+  const isPasswordCorrect= await user.isPasswordCorrect(oldPassword)
+ if(!isPasswordCorrect){
+  throw new ApiError("Old password is incorrect", 400);
+ }
+
+ user.password=newPassword
+ await user.save({validateBeforeSave:false})
+
+ return res
+ .status(200)
+ .json(new ApiResponse(200,{},"Passowrd changed"))
+
+
+})
+
+/*getting the current user*/
+const getCurrentUser=asyncHandler(async(req,res)=>{
+ return res
+ .status(200)
+ .json(new ApiResponse(200,req.user,"CurrentUser retrieved successfully")) 
+  
+})
+
+/*Updating the account details like user 's email and password*/
+const updateAccountDetails=asyncHandler(async(req,res)=>{
+  const {fullname,email}=req.body
+  if(fullname||email){
+    throw new ApiError("Fullname or email is required", 400);  // ��️ This validation should be performed on the server-side to prevent potential security vulnerabilities.  //
+  }
+const user=await User.findByIdAndUpdate(
+  req.user?._id,
+  {
+    set:{
+      fullname,
+      email,
+      updatedAt: new Date(),
+    }
+  },
+  {new: true}
+).select("-password")
+//returning the response
+return res
+.status(200)
+.json(new ApiResponse(200,req.user),"Account details updated successfully")
+})
+
+/*Updating the files*/
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError("Please upload an avatar", 400);
+  }
+
+  // Uploading to Cloudinary
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar.url) {
+    throw new ApiError("Failed to upload avatar to Cloudinary", 500);
+  }
+
+  // Updating the user's avatar
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url,
+        updatedAt: new Date(),
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  // Sending a successful response
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar updated successfully"))
+    .catch((error) => {
+      console.error("Error while updating avatar:", error);
+      throw new ApiError(500, error?.message || "Failed to update avatar");
+    });
+});
+
+
+/*Updating the coverImge*/
+const updateCoverImageAvatar = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+
+  if (!coverImageLocalPath) {
+    throw new ApiError("Please upload Cover Image Avatar", 400);
+  }
+
+  // Uploading to Cloudinary
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+  if (!coverImage.url) {
+    throw new ApiError("Failed to upload cover image to Cloudinary", 500);
+  }
+
+  // Updating the user's cover image
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        coverImage: coverImage.url,
+        updatedAt: new Date(),
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Cover image updated successfully"))
+    .catch((error) => {
+      console.error("Error while updating cover image:", error);
+      throw new ApiError(500, error?.message || "Failed to update cover image");
+    });
+});
 
 
 
@@ -229,5 +353,10 @@ export {
   registerUser,
   loginUser,
   logoutUser,
-  refreshAccessToken,  // Newly added function for refreshing access token  // ❗️ This function should be protected with JWT middleware to ensure only authenticated users can refresh their tokens.  // 🚨 This is just a basic implementation, you should implement proper token handling and validation.  // 🔒 Make sure to replace `process.env.REFRESH_TOKEN_SECRET` with your own secret key for refresh token generation and verification.  // 🔒 This function is not
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateCoverImageAvatar// Newly added function for refreshing access token  // ❗️ This function should be protected with JWT middleware to ensure only authenticated users can refresh their tokens.  // 🚨 This is just a basic implementation, you should implement proper token handling and validation.  // 🔒 Make sure to replace `process.env.REFRESH_TOKEN_SECRET` with your own secret key for refresh token generation and verification.  // 🔒 This function is not
 };
