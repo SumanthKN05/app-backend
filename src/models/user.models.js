@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-
+//schema creation
 const userSchema = new Schema({
   username: {
     type: String,
@@ -50,12 +50,17 @@ const userSchema = new Schema({
   },
 }, { timestamps: true });
 
-// Password Encryption Middleware
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10); // Fixed bcrypt hashing
   next();
-});
+});//It checks if the password has been changed or created for the first time.
+//If yes, it hashes (encrypts) the password using bcrypt before saving it to the database
+/*pre("save") → Runs before the user is saved in the database.
+async function (next) { → Allows using await for hashing the password
+bcrypt.hash(this.password, 10) → Hashes the password with 10 rounds of encryption.
+this.password = ... → Replaces the plain text password with the hashed version.*/
 
 // Password Comparison Method
 userSchema.methods.isPasswordCorrect = async function (password) {

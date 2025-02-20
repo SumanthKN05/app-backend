@@ -33,6 +33,18 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       "-password -refreshToken"
     );
     console.log("user found",user)
+    
+    
+    /*✨ Why Use ?.?
+    ✅ Prevents crashes when decodedToken is null or undefined.
+    ✅ Makes the code safer and avoids unnecessary checks like if(decodedToken).*/
+
+
+
+
+
+  
+
 
     // If the user is not found, then throw an error
     if (!user) {
